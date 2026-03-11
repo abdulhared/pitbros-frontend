@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shop — PitBros</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    /* HERO */
+    .hero {
+      min-height: 90vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-bottom: 1px solid var(--border);
+    }
+    .hero-left {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 4rem 3rem;
+      border-right: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-bg-text {
+      position: absolute;
+      top: 50%;
+      left: -1rem;
+      transform: translateY(-50%);
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 22vw;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.03);
+      letter-spacing: -0.03em;
+      user-select: none;
+      line-height: 0.9;
+      pointer-events: none;
+    }
+    .hero-eyebrow {
+      font-family: var(--font-display);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--mid);
+      margin-bottom: 1rem;
+      position: relative;
+    }
+    .hero-heading {
+      font-size: clamp(3.5rem, 7vw, 6rem);
+      font-weight: 900;
+      text-transform: uppercase;
+      line-height: 0.95;
+      letter-spacing: -0.02em;
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+    .hero-desc {
+      color: var(--mid);
+      font-size: 0.92rem;
+      max-width: 400px;
+      line-height: 1.75;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+    .hero-actions { display: flex; gap: 0.75rem; position: relative; }
+
+    .hero-right {
+      display: grid;
+      grid-template-rows: 1fr 1fr;
+    }
+    .hero-cell {
+      background: var(--black-2);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      font-family: var(--font-display);
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--mid-2);
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      transition: background var(--transition);
+    }
+    .hero-cell:last-child { border-bottom: none; }
+    .hero-cell:hover { background: var(--black-3); }
+    .hero-cell-label {
+      position: absolute;
+      bottom: 1rem; left: 1rem;
+      font-family: var(--font-display);
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--mid);
+    }
+    .hero-cell-title {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      color: var(--white);
+      letter-spacing: -0.01em;
+    }
+    .hero-cell-icon { font-size: 4rem; opacity: 0.3; }
+
+    /* TICKER */
+    .ticker {
+      border-bottom: 1px solid var(--border);
+      border-top: 1px solid var(--border);
+      background: var(--white);
+      height: 38px;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+    }
+    .ticker-track {
+      display: flex;
+      animation: ticker 22s linear infinite;
+      white-space: nowrap;
+    }
+    .ticker-item {
+      font-family: var(--font-display);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--black);
+      padding: 0 2rem;
+    }
+    .ticker-sep { color: rgba(0,0,0,0.3); }
+    @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* SHOP SECTION */
+    .shop-section { padding: 3rem 0 5rem; }
+    .shop-controls {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+    .search-wrap {
+      position: relative;
+      margin-left: auto;
+    }
+    .search-wrap input {
+      width: 220px;
+      padding-left: 2.25rem;
+      height: 38px;
+      font-size: 0.82rem;
+    }
+    .search-icon {
+      position: absolute;
+      left: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--mid-2);
+      font-size: 0.85rem;
+      pointer-events: none;
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .no-products {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 5rem 2rem;
+      color: var(--mid);
+    }
+    .no-products p { font-size: 0.9rem; margin-top: 0.5rem; }
+
+    /* PRODUCT DETAIL MODAL */
+    .pd-modal { max-width: 640px; }
+    .pd-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .pd-img {
+      aspect-ratio: 3/4;
+      background: var(--black-3);
+      border-radius: var(--radius);
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+      font-size: 5rem;
+    }
+    .pd-img img { width: 100%; height: 100%; object-fit: cover; }
+    .pd-info { display: flex; flex-direction: column; justify-content: space-between; }
+    .pd-brand { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--mid); margin-bottom: 0.4rem; }
+    .pd-name { font-size: 1.5rem; margin-bottom: 0.5rem; }
+    .pd-price { font-family: var(--font-display); font-size: 1.6rem; font-weight: 800; margin-bottom: 1rem; }
+    .pd-desc { font-size: 0.82rem; color: var(--mid); line-height: 1.7; margin-bottom: 1.25rem; }
+    .pd-section-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--mid); margin-bottom: 0.5rem; }
+    .variant-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1rem; }
+    .variant-chip {
+      padding: 0 0.75rem;
+      height: 32px;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      background: none;
+      color: var(--mid);
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .variant-chip:hover { border-color: rgba(255,255,255,0.3); color: var(--white); }
+    .variant-chip.selected { background: var(--white); color: var(--black); border-color: var(--white); }
+    .variant-chip.out-of-stock { opacity: 0.3; cursor: not-allowed; }
+    .pd-qty-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem; }
+    .pd-qty-input { width: 72px !important; text-align: center; }
+    @media (max-width: 600px) { .pd-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a class="nav-logo" href="user_landing.html">PitBros</a>
+  <div class="nav-links">
+    <a class="nav-link active" href="user_landing.html">Shop</a>
+    <a class="nav-link" href="user_account.html">Account</a>
+  </div>
+  <div class="nav-actions">
+    <button class="nav-icon-btn" id="cart-toggle-btn" title="Cart">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M6 2 3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+        <line x1="3" y1="6" x2="21" y2="6"/>
+        <path d="M16 10a4 4 0 01-8 0"/>
+      </svg>
+      <span class="cart-count-badge" id="cart-count-badge">0</span>
+    </button>
+    <button class="btn btn-outline-white btn-sm" id="logout-btn">Sign Out</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-bg-text">PB</div>
+    <div class="hero-eyebrow">SS 2025 Collection</div>
+    <h1 class="hero-heading">Sport.<br/>Street.<br/>Culture.</h1>
+    <p class="hero-desc">Premium activewear engineered for movement, designed for the street. T-Shirts, Tracksuits, Sport Shoes.</p>
+    <div class="hero-actions">
+      <button class="btn btn-white btn-lg" onclick="document.getElementById('shop').scrollIntoView({behavior:'smooth'})">Shop Now</button>
+      <a href="user_account.html" class="btn btn-outline-white btn-lg">My Account</a>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-cell" onclick="filterCategory('tshirts')">
+      <div class="hero-cell-icon">👕</div>
+      <div class="hero-cell-title">T-Shirts</div>
+      <span class="hero-cell-label">Shop category →</span>
+    </div>
+    <div class="hero-cell" onclick="filterCategory('tracksuits')">
+      <div class="hero-cell-icon">🧥</div>
+      <div class="hero-cell-title">Tracksuits</div>
+      <span class="hero-cell-label">Shop category →</span>
+    </div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-track" id="ticker-track">
+    <span class="ticker-item">Free shipping on orders over $50</span>
+    <span class="ticker-item ticker-sep">✦</span>
+    <span class="ticker-item">Premium T-Shirts</span>
+    <span class="ticker-item ticker-sep">✦</span>
+    <span class="ticker-item">Performance Tracksuits</span>
+    <span class="ticker-item ticker-sep">✦</span>
+    <span class="ticker-item">Sport Shoes</span>
+    <span class="ticker-item ticker-sep">✦</span>
+    <span class="ticker-item">New Drops Every Week</span>
+    <span class="ticker-item ticker-sep">✦</span>
+    <!-- Duplicate for seamless loop -->
+    <span class="ticker-item">Free shipping on orders over $50</span>
+    <span class="ticker-item ticker-sep">✦</span>
+    <span class="ticker-item">Premium T-Shirts</span>
+    <span class="ticker-item ticker-sep">✦</span>
+    <span class="ticker-item">Performance Tracksuits</span>
+    <span class="ticker-item ticker-sep">✦</span>
+    <span class="ticker-item">Sport Shoes</span>
+    <span class="ticker-item ticker-sep">✦</span>
+    <span class="ticker-item">New Drops Every Week</span>
+    <span class="ticker-item ticker-sep">✦</span>
+  </div>
+</div>
+
+<!-- SHOP SECTION -->
+<section class="shop-section" id="shop">
+  <div class="container">
+    <div class="section-title">All Products</div>
+    <div class="shop-controls">
+      <div class="chip-row">
+        <button class="chip active" data-cat="">All</button>
+        <button class="chip" data-cat="tshirts">T-Shirts</button>
+        <button class="chip" data-cat="tracksuits">Tracksuits</button>
+        <button class="chip" data-cat="sport_shoes">Sport Shoes</button>
+      </div>
+      <div class="search-wrap">
+        <span class="search-icon">⌕</span>
+        <input type="text" id="search-input" placeholder="Search products…" />
+      </div>
+    </div>
+
+    <div class="products-grid" id="products-grid">
+      <!-- JS rendered -->
+    </div>
+    <div id="grid-loading" class="text-center text-muted mt-4" style="padding:4rem;">Loading…</div>
+  </div>
+</section>
+
+<!-- CART DRAWER -->
+<div class="cart-drawer-overlay" id="cart-drawer-overlay"></div>
+<div class="cart-drawer" id="cart-drawer">
+  <div class="cart-drawer-head">
+    <span class="cart-drawer-title">Cart</span>
+    <button class="nav-icon-btn" id="cart-drawer-close">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+  </div>
+  <div class="cart-drawer-body" id="cart-body"></div>
+  <div class="cart-drawer-foot" id="cart-foot" style="display:none;">
+    <div class="cart-total-row">
+      <span class="cart-total-label">Total</span>
+      <span class="cart-total-val" id="cart-total-val">$0.00</span>
+    </div>
+    <a href="payment.html" class="btn btn-white btn-full">Checkout →</a>
+    <button class="btn btn-ghost btn-full mt-1" onclick="cart.closeDrawer()">Continue Shopping</button>
+  </div>
+</div>
+
+<!-- PRODUCT DETAIL MODAL -->
+<div class="modal-overlay" id="pd-modal-overlay">
+  <div class="modal pd-modal">
+    <div class="modal-header">
+      <span class="pd-brand" id="pd-brand">—</span>
+      <button class="modal-close" onclick="closeModal('pd-modal-overlay')">✕</button>
+    </div>
+    <div class="pd-grid">
+      <div class="pd-img" id="pd-img">👕</div>
+      <div class="pd-info">
+        <div>
+          <h2 class="pd-name" id="pd-name">—</h2>
+          <div class="pd-price" id="pd-price">—</div>
+          <p class="pd-desc" id="pd-desc"></p>
+        </div>
+        <div>
+          <div class="pd-section-label">Size</div>
+          <div class="variant-chips" id="pd-sizes"></div>
+          <div class="pd-section-label">Colour</div>
+          <div class="variant-chips" id="pd-colors"></div>
+          <div class="pd-section-label">Quantity</div>
+          <div class="pd-qty-row">
+            <input type="number" class="pd-qty-input" id="pd-qty" value="1" min="1" max="99" />
+          </div>
+          <button class="btn btn-white btn-full" id="pd-add-btn">Add to Cart</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/cart.js"></script>
+<script>
+  if (!auth.isLoggedIn()) window.location.href = 'user_login.html';
+  document.getElementById('logout-btn').addEventListener('click', () => auth.logout());
+
+  let currentCat = '';
+  let selectedVariantId = null;
+  let currentProduct = null;
+
+  // ── CATEGORY FILTER CHIPS
+  document.querySelectorAll('.chip[data-cat]').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.chip[data-cat]').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      currentCat = chip.dataset.cat;
+      loadProducts();
+    });
+  });
+
+  // ── SEARCH
+  document.getElementById('search-input').addEventListener('input', debounce(loadProducts, 380));
+
+  // ── LOAD PRODUCTS
+  async function loadProducts() {
+    const grid    = document.getElementById('products-grid');
+    const loading = document.getElementById('grid-loading');
+    const q       = document.getElementById('search-input').value.trim();
+
+    grid.innerHTML = '';
+    loading.style.display = 'block';
+
+    try {
+      let url = '/products?per_page=40';
+      if (currentCat) url += `&category=${currentCat}`;
+      if (q)          url += `&q=${encodeURIComponent(q)}`;
+      const data = await api.get(url);
+      loading.style.display = 'none';
+
+      if (!data.products?.length) {
+        grid.innerHTML = `<div class="no-products">
+          <div style="font-size:3rem;">${CATEGORY_ICONS[currentCat] || '🔍'}</div>
+          <p>No products found${q ? ` for "${q}"` : ''}.</p>
+        </div>`;
+        return;
+      }
+
+      data.products.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'product-card animate-in';
+        const price = p.min_price != null ? formatCurrency(p.min_price) : 'See options';
+        const icon  = CATEGORY_ICONS[p.category] || '👕';
+        card.innerHTML = `
+          <div class="product-card-img">
+            <span class="product-card-category-tag">${CATEGORY_LABELS[p.category] || p.category || ''}</span>
+            ${p.image_url
+              ? `<img src="${p.image_url}" alt="${p.name}" loading="lazy" />`
+              : `<span class="no-img">${icon}</span>`}
+          </div>
+          <div class="product-card-body">
+            <div class="product-card-brand">${p.brand || 'PitBros'}</div>
+            <div class="product-card-name">${p.name}</div>
+            <div class="product-card-price">${price}</div>
+          </div>`;
+        card.addEventListener('click', () => openProductDetail(p.id));
+        grid.appendChild(card);
+      });
+    } catch (err) {
+      loading.textContent = 'Failed to load. Is the backend running?';
+    }
+  }
+
+  // ── PRODUCT DETAIL MODAL
+  async function openProductDetail(productId) {
+    selectedVariantId = null;
+    currentProduct = null;
+    try {
+      const { product } = await api.get(`/products/${productId}`);
+      currentProduct = product;
+
+      document.getElementById('pd-brand').textContent = product.brand || 'PitBros';
+      document.getElementById('pd-name').textContent  = product.name;
+      document.getElementById('pd-desc').textContent  = product.description || '';
+
+      const imgEl = document.getElementById('pd-img');
+      imgEl.innerHTML = product.image_url
+        ? `<img src="${product.image_url}" alt="${product.name}" />`
+        : CATEGORY_ICONS[product.category] || '👕';
+
+      // Collect unique sizes and colours from active variants
+      const variants = product.variants?.filter(v => v.active) || [];
+      const sizes    = [...new Set(variants.map(v => v.size).filter(Boolean))];
+      const colors   = [...new Set(variants.map(v => v.color).filter(Boolean))];
+
+      // Set initial price
+      if (variants.length) {
+        document.getElementById('pd-price').textContent = formatCurrency(variants[0].price);
+        selectedVariantId = variants[0].id;
+      }
+
+      function renderChips(containerId, items, onSelect) {
+        const c = document.getElementById(containerId);
+        c.innerHTML = '';
+        if (!items.length) { c.innerHTML = '<span class="text-muted text-xs">—</span>'; return; }
+        items.forEach((val, i) => {
+          const chip = document.createElement('button');
+          chip.className = `variant-chip${i === 0 ? ' selected' : ''}`;
+          chip.textContent = val;
+          chip.addEventListener('click', () => {
+            c.querySelectorAll('.variant-chip').forEach(x => x.classList.remove('selected'));
+            chip.classList.add('selected');
+            onSelect(val);
+          });
+          c.appendChild(chip);
+        });
+      }
+
+      function resolveVariant() {
+        const selSize  = document.querySelector('#pd-sizes .variant-chip.selected')?.textContent;
+        const selColor = document.querySelector('#pd-colors .variant-chip.selected')?.textContent;
+        const match = variants.find(v =>
+          (!selSize  || v.size  === selSize)  &&
+          (!selColor || v.color === selColor)
+        ) || variants[0];
+        if (match) {
+          selectedVariantId = match.id;
+          document.getElementById('pd-price').textContent = formatCurrency(match.price);
+        }
+      }
+
+      renderChips('pd-sizes',  sizes,  resolveVariant);
+      renderChips('pd-colors', colors, resolveVariant);
+      resolveVariant();
+
+      document.getElementById('pd-qty').value = 1;
+      openModal('pd-modal-overlay');
+    } catch (err) {
+      showToast('Failed to load product', 'error');
+    }
+  }
+
+  // ── ADD TO CART FROM MODAL
+  document.getElementById('pd-add-btn').addEventListener('click', async () => {
+    if (!selectedVariantId) { showToast('Please select a variant', 'error'); return; }
+    const qty = parseInt(document.getElementById('pd-qty').value) || 1;
+    const btn = document.getElementById('pd-add-btn');
+    setLoading(btn, true);
+    try {
+      await cart.addItem(selectedVariantId, qty);
+      closeModal('pd-modal-overlay');
+    } catch { /* cart.addItem shows its own toast */ }
+    finally { setLoading(btn, false); }
+  });
+
+  // ── HERO CATEGORY FILTER
+  window.filterCategory = function(cat) {
+    currentCat = cat;
+    document.querySelectorAll('.chip[data-cat]').forEach(c => c.classList.remove('active'));
+    document.querySelector(`.chip[data-cat="${cat}"]`)?.classList.add('active');
+    loadProducts();
+    document.getElementById('shop').scrollIntoView({ behavior: 'smooth' });
+  };
+
+  loadProducts();
+</script>
+</body>
+</html>

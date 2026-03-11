@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — PitBros</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    body { display: grid; place-items: center; min-height: 100vh; background: var(--black); }
+
+    .admin-gate {
+      width: 100%; max-width: 360px;
+      padding: 1.5rem;
+    }
+
+    .gate-header {
+      margin-bottom: 3rem;
+    }
+
+    .gate-logo {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 1.3rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      display: block;
+    }
+
+    .gate-sub {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--mid-2);
+      margin-top: 0.25rem;
+    }
+
+    .gate-title {
+      font-size: 1.75rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .gate-desc { font-size: 0.82rem; color: var(--mid); margin-bottom: 2rem; }
+
+    .secure-note {
+      display: flex; align-items: flex-start; gap: 0.5rem;
+      border-top: 1px solid var(--border);
+      padding-top: 1.5rem;
+      margin-top: 1.5rem;
+      font-size: 0.75rem;
+      color: var(--mid-2);
+      line-height: 1.6;
+    }
+    .lock-icon { font-size: 0.85rem; flex-shrink: 0; margin-top: 0.1rem; }
+
+    .back-link {
+      display: block;
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--mid-2);
+      margin-top: 1.5rem;
+      transition: color var(--transition);
+    }
+    .back-link:hover { color: var(--mid); }
+  </style>
+</head>
+<body>
+
+<div class="admin-gate">
+  <div class="gate-header">
+    <span class="gate-logo">PitBros</span>
+    <span class="gate-sub">Admin Console</span>
+  </div>
+
+  <h1 class="gate-title">Admin Access</h1>
+  <p class="gate-desc">Restricted area. Sign in with your administrator credentials.</p>
+
+  <div class="alert alert-error" id="login-alert"></div>
+
+  <div class="form-group">
+    <label class="form-label">Email</label>
+    <input type="email" id="a-username" placeholder="admin@gmail.com" autocomplete="email" />
+  </div>
+  <div class="form-group">
+    <label class="form-label">Password</label>
+    <input type="password" id="a-password" placeholder="••••••••" autocomplete="current-password" />
+  </div>
+
+  <button class="btn btn-white btn-full mt-3" id="admin-login-btn">Sign In</button>
+
+  <div class="secure-note">
+    <span class="lock-icon">🔒</span>
+    <span>Unauthorized access attempts are logged and may be reported. This area is for authorized PitBros staff only.</span>
+  </div>
+
+  <a href="user_login.html" class="back-link">← Customer store</a>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/ui.js"></script>
+<script>
+  if (auth.isLoggedIn() && auth.isAdmin()) window.location.href = 'admin_account.html';
+
+  const loginBtn = document.getElementById('admin-login-btn');
+
+  async function doAdminLogin() {
+    const alert    = document.getElementById('login-alert');
+    const username = document.getElementById('a-username').value.trim();
+    const password = document.getElementById('a-password').value;
+    hideAlert(alert);
+    if (!username || !password) { showAlert(alert, 'Both fields are required.'); return; }
+
+    setLoading(loginBtn, true);
+    try {
+      const data = await api.post('/auth/login', { username, email: username, password }, false);
+      if (data.user?.role !== 'admin') {
+        showAlert(alert, 'Access denied. Administrator role required.');
+        return;
+      }
+      auth.save(data);
+      window.location.href = 'admin_account.html';
+    } catch (err) {
+      showAlert(alert, 'Invalid credentials.');
+    } finally {
+      setLoading(loginBtn, false);
+    }
+  }
+
+  loginBtn.addEventListener('click', doAdminLogin);
+  onEnter(document.getElementById('a-password'), doAdminLogin);
+  onEnter(document.getElementById('a-username'), doAdminLogin);
+</script>
+</body>
+</html>

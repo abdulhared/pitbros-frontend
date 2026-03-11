@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Account — PitBros</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    .profile-bar {
+      border-bottom: 1px solid var(--border);
+      padding: 1.5rem 2.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+    .avatar {
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      background: var(--black-3);
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 1.25rem;
+      color: var(--white);
+      flex-shrink: 0;
+    }
+    .profile-bar-info h2 { font-size: 1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+    .profile-bar-info p { font-size: 0.78rem; color: var(--mid); margin-top: 0.1rem; }
+    .profile-complete-bar {
+      height: 2px; background: var(--border);
+      border-radius: 1px; margin-top: 0.4rem; width: 160px;
+    }
+    .profile-complete-fill { height: 100%; background: var(--white); border-radius: 1px; transition: width 0.5s; }
+
+    .address-card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.25rem;
+      position: relative;
+      font-size: 0.85rem;
+    }
+    .address-card.default-addr { border-color: rgba(255,255,255,0.3); }
+    .addr-label {
+      font-family: var(--font-display);
+      font-size: 0.65rem; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--mid); margin-bottom: 0.5rem;
+    }
+    .addr-default-tag {
+      position: absolute; top: 0.75rem; right: 0.75rem;
+      font-size: 0.6rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--white);
+    }
+
+    .order-row {
+      display: grid;
+      grid-template-columns: 1fr 110px 110px 80px;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+      border-bottom: 1px solid var(--border-2);
+      cursor: pointer;
+      transition: background var(--transition);
+    }
+    .order-row:hover { background: rgba(255,255,255,0.02); }
+    .order-row:last-child { border-bottom: none; }
+    .order-num { font-size: 0.85rem; font-weight: 700; font-family: var(--font-display); text-transform: uppercase; letter-spacing: 0.04em; }
+    .order-date { font-size: 0.75rem; color: var(--mid); margin-top: 0.15rem; }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-logo" href="user_landing.html">PitBros</a>
+  <div class="nav-links">
+    <a class="nav-link" href="user_landing.html">Shop</a>
+    <a class="nav-link active" href="user_account.html">Account</a>
+  </div>
+  <div class="nav-actions">
+    <button class="btn btn-outline-white btn-sm" onclick="auth.logout()">Sign Out</button>
+  </div>
+</nav>
+
+<div class="layout-sidebar">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Account</div>
+      <button class="sidebar-item active" data-section="profile" onclick="showSection('profile')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+        Profile
+      </button>
+      <button class="sidebar-item" data-section="orders" onclick="showSection('orders')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M6 2 3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <path d="M16 10a4 4 0 01-8 0"/>
+        </svg>
+        Orders
+      </button>
+      <button class="sidebar-item" data-section="addresses" onclick="showSection('addresses')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+          <circle cx="12" cy="10" r="3"/>
+        </svg>
+        Addresses
+      </button>
+    </div>
+    <div class="sidebar-spacer"></div>
+    <div class="sidebar-section">
+      <a class="sidebar-item" href="user_landing.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+          <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+        Back to Shop
+      </a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div>
+    <!-- PROFILE BAR -->
+    <div class="profile-bar">
+      <div class="avatar" id="avatar-el">?</div>
+      <div class="profile-bar-info">
+        <h2 id="display-name">Loading…</h2>
+        <p id="display-email">—</p>
+        <div class="profile-complete-bar"><div class="profile-complete-fill" id="complete-fill" style="width:0%"></div></div>
+      </div>
+    </div>
+
+    <div class="main-content">
+
+      <!-- PROFILE SECTION -->
+      <div class="section-panel" id="section-profile">
+        <div class="section-title">Personal Info</div>
+        <div class="card">
+          <div class="alert" id="profile-alert"></div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">First Name</label>
+              <input type="text" id="f-first" placeholder="John" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Last Name</label>
+              <input type="text" id="f-last" placeholder="Doe" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Phone</label>
+              <input type="tel" id="f-phone" placeholder="+1 555 000 0000" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Date of Birth</label>
+              <input type="date" id="f-dob" />
+            </div>
+          </div>
+          <div class="form-group" style="max-width:240px;">
+            <label class="form-label">Gender</label>
+            <select id="f-gender">
+              <option value="">Select…</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+              <option value="prefer_not">Prefer not to say</option>
+            </select>
+          </div>
+          <button class="btn btn-white mt-2" id="save-profile-btn">Save Changes</button>
+        </div>
+      </div>
+
+      <!-- ORDERS SECTION -->
+      <div class="section-panel hidden" id="section-orders">
+        <div class="section-title">My Orders</div>
+        <div class="card" style="padding:0; overflow:hidden;">
+          <div id="orders-container">
+            <div class="text-center text-muted" style="padding:3rem;">Loading…</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADDRESSES SECTION -->
+      <div class="section-panel hidden" id="section-addresses">
+        <div class="flex justify-between items-center mb-3">
+          <div class="section-title" style="margin-bottom:0;">Saved Addresses</div>
+          <button class="btn btn-outline-white btn-sm" onclick="openModal('addr-modal')">+ Add Address</button>
+        </div>
+        <div class="grid-2" id="address-grid"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ADD ADDRESS MODAL -->
+<div class="modal-overlay" id="addr-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 style="font-size:1.1rem;">Add Address</h3>
+      <button class="modal-close" onclick="closeModal('addr-modal')">✕</button>
+    </div>
+    <div class="alert" id="addr-alert"></div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Label</label>
+        <select id="a-label">
+          <option value="home">Home</option>
+          <option value="work">Work</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Phone Number</label>
+        <input type="tel" id="a-phone" placeholder="+1 555 000 0000" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Street Address *</label>
+      <input type="text" id="a-line1" placeholder="123 Main Street" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Apt / Suite</label>
+      <input type="text" id="a-line2" placeholder="Apt 4B" />
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">City *</label>
+        <input type="text" id="a-city" placeholder="New York" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Postal Code</label>
+        <input type="text" id="a-postal" placeholder="10001" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Country</label>
+      <input type="text" id="a-country" value="United States" />
+    </div>
+    <div class="flex gap-2 mt-2">
+      <button class="btn btn-white" id="save-addr-btn">Save Address</button>
+      <button class="btn btn-ghost" onclick="closeModal('addr-modal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/ui.js"></script>
+<script>
+  if (!auth.requireAuth()) throw new Error('Not authenticated');
+
+  // ── PROFILE
+  async function loadProfile() {
+    try {
+      const { profile } = await api.get('/user/profile');
+      const initials = [profile.first_name, profile.last_name].filter(Boolean).map(s => s[0]).join('')
+        || profile.username[0].toUpperCase();
+      document.getElementById('avatar-el').textContent = initials;
+      document.getElementById('display-name').textContent =
+        profile.first_name ? `${profile.first_name} ${profile.last_name || ''}`.trim() : profile.username;
+      document.getElementById('display-email').textContent = profile.email;
+
+      const pct = [profile.first_name, profile.last_name, profile.phone, profile.date_of_birth, profile.gender]
+        .filter(Boolean).length * 20;
+      document.getElementById('complete-fill').style.width = `${pct}%`;
+
+      ['first_name','last_name','phone','gender'].forEach(f => {
+        const el = document.getElementById(`f-${f.replace('_name','').replace('_','')}`);
+        if (!el) {
+          // Map field names to input IDs
+          const idMap = { first_name:'f-first', last_name:'f-last', phone:'f-phone', gender:'f-gender' };
+          const mapped = document.getElementById(idMap[f]);
+          if (mapped && profile[f]) mapped.value = profile[f];
+        } else if (profile[f]) el.value = profile[f];
+      });
+      if (profile.date_of_birth) document.getElementById('f-dob').value = profile.date_of_birth;
+      // Fix mapping
+      const idMap = { first_name:'f-first', last_name:'f-last', phone:'f-phone', gender:'f-gender' };
+      Object.entries(idMap).forEach(([field, id]) => {
+        const el = document.getElementById(id);
+        if (el && profile[field]) el.value = profile[field];
+      });
+    } catch { showToast('Failed to load profile', 'error'); }
+  }
+
+  document.getElementById('save-profile-btn').addEventListener('click', async () => {
+    const btn   = document.getElementById('save-profile-btn');
+    const alert = document.getElementById('profile-alert');
+    hideAlert(alert);
+    setLoading(btn, true);
+    try {
+      await api.put('/user/profile', {
+        first_name: document.getElementById('f-first').value,
+        last_name:  document.getElementById('f-last').value,
+        phone:      document.getElementById('f-phone').value,
+        gender:     document.getElementById('f-gender').value,
+        date_of_birth: document.getElementById('f-dob').value,
+      });
+      showToast('Profile updated');
+      loadProfile();
+    } catch (err) { showAlert(alert, err.message); }
+    finally { setLoading(btn, false); }
+  });
+
+  // ── ORDERS
+  async function loadOrders() {
+    const c = document.getElementById('orders-container');
+    try {
+      const { orders } = await api.get('/orders');
+      if (!orders?.length) {
+        c.innerHTML = `<div class="text-center text-muted" style="padding:3rem;">
+          <div style="font-size:2rem;margin-bottom:.75rem;">📦</div>
+          <p>No orders yet.</p>
+          <a href="user_landing.html" class="btn btn-outline-white btn-sm mt-2">Start Shopping</a>
+        </div>`;
+        return;
+      }
+      c.innerHTML = orders.map(o => `
+        <div class="order-row" onclick="window.location.href='payment.html?view=${o.id}'">
+          <div>
+            <div class="order-num">${o.order_number}</div>
+            <div class="order-date">${formatDate(o.created_at)}</div>
+          </div>
+          <div>${statusBadge(o.status)}</div>
+          <div class="text-sm font-bold">${formatCurrency(o.total_amount)}</div>
+          <div class="text-xs text-muted text-right">View →</div>
+        </div>`).join('');
+    } catch { c.innerHTML = '<div class="text-center text-muted" style="padding:2rem;">Failed to load.</div>'; }
+  }
+
+  // ── ADDRESSES
+  async function loadAddresses() {
+    const grid = document.getElementById('address-grid');
+    try {
+      const { addresses } = await api.get('/user/addresses');
+      if (!addresses?.length) {
+        grid.innerHTML = `<div class="text-muted text-sm" style="grid-column:1/-1;padding:1rem 0;">No addresses saved yet.</div>`;
+        return;
+      }
+      grid.innerHTML = addresses.map(a => `
+        <div class="address-card${a.is_default ? ' default-addr' : ''}">
+          ${a.is_default ? '<span class="addr-default-tag">Default</span>' : ''}
+          <div class="addr-label">${a.label}</div>
+          <div>${a.line1}${a.line2 ? ', ' + a.line2 : ''}</div>
+          <div>${a.city}${a.postal_code ? ' ' + a.postal_code : ''}</div>
+          <div class="text-muted">${a.country}</div>
+          <div class="text-muted mt-1">${a.phone_number}</div>
+          <button class="btn btn-ghost btn-sm mt-2" style="padding:0;color:var(--mid);font-size:.75rem;" onclick="deleteAddr(${a.id})">Remove</button>
+        </div>`).join('');
+    } catch {}
+  }
+
+  window.deleteAddr = async function(id) {
+    try {
+      await api.delete(`/user/addresses/${id}`);
+      showToast('Address removed');
+      loadAddresses();
+    } catch (err) { showToast(err.message, 'error'); }
+  };
+
+  document.getElementById('save-addr-btn').addEventListener('click', async () => {
+    const btn   = document.getElementById('save-addr-btn');
+    const alert = document.getElementById('addr-alert');
+    hideAlert(alert);
+    const line1 = document.getElementById('a-line1').value.trim();
+    const city  = document.getElementById('a-city').value.trim();
+    const phone = document.getElementById('a-phone').value.trim();
+    if (!line1 || !city || !phone) { showAlert(alert, 'Street address, city, and phone are required.'); return; }
+
+    setLoading(btn, true);
+    try {
+      await api.post('/user/addresses', {
+        label:        document.getElementById('a-label').value,
+        line1, line2: document.getElementById('a-line2').value,
+        city,  postal_code: document.getElementById('a-postal').value,
+        country:      document.getElementById('a-country').value,
+        phone_number: phone,
+      });
+      closeModal('addr-modal');
+      showToast('Address saved');
+      loadAddresses();
+    } catch (err) { showAlert(alert, err.message); }
+    finally { setLoading(btn, false); }
+  });
+
+  // ── SECTION LOADER
+  window.onSectionShow = function(id) {
+    if (id === 'orders')    loadOrders();
+    if (id === 'addresses') loadAddresses();
+  };
+
+  loadProfile();
+</script>
+</body>
+</html>
